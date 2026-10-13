@@ -1158,9 +1158,12 @@ const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const
 chapters.forEach(c=>io.observe(c));
 const heroIO=new IntersectionObserver(es=>{if(es[0].isIntersecting)setActive(-1)},{rootMargin:'-40% 0px -50% 0px'});heroIO.observe($('.hero'));
 function setActive(i){
+  if(i===current)return;
   current=i;
   $$('.step').forEach((s,j)=>s.classList.toggle('active',j===i));
-  $$('#chips a').forEach((a,j)=>{a.classList.toggle('active',j===i);if(j===i)a.scrollIntoView({block:'nearest',inline:'center',behavior:'smooth'})});
+  const chips=$('#chips');
+  $$('#chips a').forEach((a,j)=>{a.classList.toggle('active',j===i);
+    if(j===i&&chips.offsetParent!==null&&chips.scrollWidth>chips.clientWidth){const cr=chips.getBoundingClientRect(),ar=a.getBoundingClientRect();chips.scrollTo({left:chips.scrollLeft+(ar.left+ar.width/2)-(cr.left+cr.width/2),behavior:'smooth'})}});
   if(i>=0&&!visited.has(STAGES[i].id)){visited.add(STAGES[i].id);try{localStorage.setItem(KEY+'-visited',JSON.stringify([...visited]))}catch{}progress()}
   $('#mbTitle').textContent=i<0?'البداية':STAGES[i].t;$('#mbSub').textContent=`${i+1} / 7`;$('#mbTrack').style.width=((i+1)/7*100)+'%';
   $('#mbPrev').href=i<=0?'#top':'#'+STAGES[i-1].id;$('#mbNext').href=i>=6?'#top':'#'+STAGES[i+1].id;$('#mbNext').textContent=i>=6?'↑ البداية':'التالي ←';
